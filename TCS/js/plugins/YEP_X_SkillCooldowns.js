@@ -769,7 +769,7 @@ BattleManager.actionSTypeCooldown = function(stypeId, actionArgs) {
 };
 
 //=============================================================================
-// Game_Battler
+// Game_BattlerBase
 //=============================================================================
 
 Yanfly.SCD.Game_BattlerBase_initMembers =
@@ -1040,9 +1040,7 @@ Game_BattlerBase.prototype.applyCooldownMods = function(skill) {
 // Game_Battler
 //=============================================================================
 
-Yanfly.SCD.Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
-Game_Battler.prototype.onBattleStart = function() {
-    Yanfly.SCD.Game_Battler_onBattleStart.call(this);
+Game_Battler.prototype.onBattleStartCooldowns = function() {
     this.resetCooldownTickRates();
     this.startWarmups();
 };
@@ -1379,19 +1377,48 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
 // Game_Unit
 //=============================================================================
 
+Yanfly.SCD.Game_Unit_onBattleStart = Game_Unit.prototype.onBattleStart;
+Game_Unit.prototype.onBattleStart = function() {
+  Yanfly.SCD.Game_Unit_onBattleStart.call(this);
+  this.onBattleStartCooldowns();
+};
+
+Game_Unit.prototype.onBattleStartCooldowns = function() {
+  var members = this.cooldownMembers();
+  var length = members.length
+  for (var i = 0; i < length; ++i) {
+    var member = members[i];
+    if (member) member.onBattleStartCooldowns();
+  }
+};
+
 Game_Unit.prototype.updateCooldowns = function() {
-    if (BattleManager.timeBasedCooldowns()) return;
-    return this.members().forEach(function(member) {
-        member.updateCooldowns();
-        member.updateWarmups();
-    });
+  if (BattleManager.timeBasedCooldowns()) return;
+  var members = this.members();
+  var length = members.length
+  for (var i = 0; i < length; ++i) {
+    var member = members[i];
+    if (member) {
+      member.updateCooldowns();
+      member.updateWarmups();
+    }
+  }
 };
 
 Game_Unit.prototype.endBattleCooldowns = function() {
-    return this.members().forEach(function(member) {
-        member.endBattleCooldowns();
-        member.clearWarmups();
-    });
+  var members = this.members();
+  var length = members.length
+  for (var i = 0; i < length; ++i) {
+    var member = members[i];
+    if (member) {
+      member.endBattleCooldowns();
+      member.clearWarmups();
+    }
+  }
+};
+
+Game_Unit.prototype.cooldownMembers = function() {
+  return this.members();
 };
 
 //=============================================================================
@@ -1408,6 +1435,10 @@ Game_Party.prototype.updateCooldownSteps = function() {
     return this.members().forEach(function(member) {
         return member.updateCooldownSteps();
     });
+};
+
+Game_Party.prototype.cooldownMembers = function() {
+  return this.allMembers();
 };
 
 //=============================================================================

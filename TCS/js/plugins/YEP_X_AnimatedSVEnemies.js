@@ -11,7 +11,7 @@ Yanfly.SVE = Yanfly.SVE || {};
 
 //=============================================================================
  /*:
- * @plugindesc v1.11 (Requires YEP_BattleEngineCore.js) This plugin lets
+ * @plugindesc v1.12 (Requires YEP_BattleEngineCore.js) This plugin lets
  * you use Animated Sideview Actors for enemies!
  * @author Yanfly Engine Plugins
  *
@@ -713,6 +713,12 @@ Yanfly.SVE = Yanfly.SVE || {};
  * Changelog
  * ============================================================================
  *
+ * Version 1.12:
+ * - Fixed a bug that caused the <Sideview Show State Overlay> and 
+ * <Sideview Hide State Overlay> notetags to not work.
+ * - Fixed a bug that caused scaled enemies to have their state icons and
+ * overlays appear in odd places.
+ *
  * Version 1.11:
  * - Fixed a bug that caused hidden enemies to appear early on.
  *
@@ -1041,7 +1047,7 @@ Game_Battler.prototype.spriteWidth = function() {
     } else {
       var value = Yanfly.SVE.Game_Battler_spriteWidth.call(this);
     }
-    value *= Math.abs(this.spriteScaleX());
+    //value *= Math.abs(this.spriteScaleX());
     return Math.floor(value);
 };
 
@@ -1052,7 +1058,7 @@ Game_Battler.prototype.spriteHeight = function() {
     } else {
       var value = Yanfly.SVE.Game_Battler_spriteHeight.call(this);
     }
-    value *= Math.abs(this.spriteScaleY());
+    //value *= Math.abs(this.spriteScaleY());
     return Math.floor(value);
 };
 
@@ -1448,12 +1454,12 @@ Sprite_Enemy.prototype.updateStateSprite = function() {
 };
 
 Sprite_Enemy.prototype.updateSVStateSprite = function() {
+    this._stateSprite.visible = this._enemy.enemy().sideviewStateOverlay;
     return;
     var height = this._enemy.spriteHeight() * -1;
     height -= Sprite_StateIcon._iconHeight;
     this._stateIconSprite.y = height;
     this._stateSprite.y = (this._enemy.spriteHeight() - 64) * -1;
-    this._stateSprite.visible = this._enemy.enemy().sideviewStateOverlay;
 };
 
 Sprite_Enemy.prototype.updateFloatingStateSprite = function() {
@@ -1511,9 +1517,11 @@ Sprite_Battler.prototype.addFloatingHeight = function() {
 } else { // If YEP_X_ActSeqPack2 is NOT installed
 
 Sprite_Enemy.prototype.updateStateIconHeight = function() {
+  if (!this._stateIconSprite) return;
   var height = this._battler.spriteHeight() * -1;
   height -= Sprite_StateIcon._iconHeight;
-  if (this._stateIconSprite) this._stateIconSprite.y = height;
+  height /= this.scale.y;
+  this._stateIconSprite.y = height;
 };
 
 } // Imported.YEP_X_ActSeqPack2

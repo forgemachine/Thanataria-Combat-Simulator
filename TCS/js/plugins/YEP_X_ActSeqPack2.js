@@ -11,7 +11,7 @@ Yanfly.ASP2 = Yanfly.ASP2 || {};
 
 //=============================================================================
  /*:
- * @plugindesc v1.09 (Requires YEP_BattleEngineCore.js) Visual functions
+ * @plugindesc v1.10 (Requires YEP_BattleEngineCore.js) Visual functions
  * are added to the Battle Engine Core's action sequences.
  * @author Yanfly Engine Plugins
  *
@@ -423,6 +423,10 @@ Yanfly.ASP2 = Yanfly.ASP2 || {};
  * ============================================================================
  * Changelog
  * ============================================================================
+ *
+ * Version 1.10:
+ * - Fixed a bug that caused scaled enemies to have their state icons and
+ * overlays appear in odd places.
  *
  * Version 1.09:
  * - Animations played on a floating or jumping battlers 'Feet' location will
@@ -1126,11 +1130,15 @@ Sprite_Battler.prototype.updateFloat = function() {
 };
 
 Sprite_Battler.prototype.updateStateSprites = function() {
-    var height = this._battler.spriteHeight() * -1;
-    height -= Sprite_StateIcon._iconHeight;
-    if (this._stateIconSprite) this._stateIconSprite.y = height;
+    if (this._stateIconSprite) {
+      var height = this._battler.spriteHeight() * -1;
+      height -= Sprite_StateIcon._iconHeight;
+      height /= this.scale.y;
+      this._stateIconSprite.y = height;
+    }
     if (this._stateSprite) {
-      this._stateSprite.y = (this._battler.spriteHeight() - 64) * -1;
+      var height = (this._battler.spriteHeight() - 64 * this.scale.y) * -1;
+      this._stateSprite.y = height;
     }
     var heightRate = 0;
     heightRate += this.getFloatHeight();

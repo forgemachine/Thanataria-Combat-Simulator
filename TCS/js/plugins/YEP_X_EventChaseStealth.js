@@ -11,7 +11,7 @@ Yanfly.ECS = Yanfly.ECS || {};
 
 //=============================================================================
  /*:
- * @plugindesc v1.01 (Requires YEP_EventChasePlayer.js) Enables a stealth
+ * @plugindesc v1.02 (Requires YEP_EventChasePlayer.js) Enables a stealth
  * mechanic for the Event Chase Player plugin.
  * @author Yanfly Engine Plugins
  *
@@ -209,6 +209,10 @@ Yanfly.ECS = Yanfly.ECS || {};
  * Changelog
  * ============================================================================
  *
+ * Version 1.02:
+ * - Fixed a bug where changing the stealth movement speed would affect all
+ * events on the map.
+ *
  * Version 1.01:
  * - Added 'EnableDifferentStealthSpeed' and 'DisableDifferentStealthSpeed'
  * plugin commands to enable different stealth movement speed adjustments.
@@ -337,21 +341,21 @@ Game_Map.prototype.isStealthRegion = function(id) {
 Yanfly.ECS.Game_CharacterBase_realMoveSpeed =
     Game_CharacterBase.prototype.realMoveSpeed;
 Game_CharacterBase.prototype.realMoveSpeed = function() {
-    if ($gamePlayer.isStealthMode() && $gameSystem.isDifferentStealthSpeed()) {
-      return this.stealthMoveSpeed() + (this.isDashing() ? 1 : 0);
-    }
-    return Yanfly.ECS.Game_CharacterBase_realMoveSpeed.call(this);
+  if (this.isStealthMode() && $gameSystem.isDifferentStealthSpeed()) {
+    return this.stealthMoveSpeed() + (this.isDashing() ? 1 : 0);
+  }
+  return Yanfly.ECS.Game_CharacterBase_realMoveSpeed.call(this);
 };
 
 Game_CharacterBase.prototype.stealthMoveSpeed = function() {
-    return Yanfly.Param.ECSMoveSpeed;
+  return Yanfly.Param.ECSMoveSpeed;
 };
 
 Yanfly.ECS.Game_CharacterBase_opacity = Game_CharacterBase.prototype.opacity;
 Game_CharacterBase.prototype.opacity = function() {
-    var opacity = Yanfly.ECS.Game_CharacterBase_opacity.call(this);
-    if (this.isStealthMode()) opacity *= this.stealthTransparencyRate();
-    return opacity;
+  var opacity = Yanfly.ECS.Game_CharacterBase_opacity.call(this);
+  if (this.isStealthMode()) opacity *= this.stealthTransparencyRate();
+  return opacity;
 };
 
 Game_CharacterBase.prototype.isStealthMode = function() {
@@ -359,7 +363,7 @@ Game_CharacterBase.prototype.isStealthMode = function() {
 };
 
 Game_CharacterBase.prototype.stealthTransparencyRate = function() {
-    return Yanfly.Param.ECSPlayerTrans;
+  return Yanfly.Param.ECSPlayerTrans;
 };
 
 //=============================================================================

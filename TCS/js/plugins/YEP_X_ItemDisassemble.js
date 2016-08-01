@@ -11,7 +11,7 @@ Yanfly.IDA = Yanfly.IDA || {};
 
 //=============================================================================
  /*:
- * @plugindesc v1.02 (Requires YEP_ItemCore.js) Grants the option to
+ * @plugindesc v1.03 (Requires YEP_ItemCore.js) Grants the option to
  * break down items in the item menu into other items.
  * @author Yanfly Engine Plugins
  *
@@ -288,6 +288,9 @@ Yanfly.IDA = Yanfly.IDA || {};
  * ============================================================================
  * Changelog
  * ============================================================================
+ *
+ * Version 1.03:
+ * - Fixed a bug that caused NaN values to appear for the displayed rates.
  *
  * Version 1.02:
  * - Fixed a typo within the code. Please update Item Core, Item Disassemble,
@@ -801,7 +804,7 @@ Window_DisassemblePool.prototype.drawDisassembleTypePool = function(dy, type) {
     var pool = ItemManager.getDisassembleItems(this._currentItem, type);
     if (!pool) return dy;
     var index = this._types.indexOf(type);
-    var rateBonus = this._rates[index];
+    var rateBonus = this._rates[index] || 0;
     var length = pool.length;
     var fmt1 = Yanfly.Param.IDAQuantityFmt1;
     var fmt2 = Yanfly.Param.IDAQuantityFmt2;
